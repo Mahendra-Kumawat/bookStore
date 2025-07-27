@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
+import { config } from "../../config/config";
 
 const globalErrorHandler = (
     err: HttpError,
@@ -15,7 +16,7 @@ const globalErrorHandler = (
         success: false,
         statusCode,
         message,
-        stack: process.env.NODE_ENV === "production" ? null : err.stack,
+        stack: config.env === "production" ? null : err.stack,
     });
 };
 

@@ -6,6 +6,7 @@ export const validate =
             schema.parse(req.body);
             next();
         } catch (error) {
+            console.log(error);
             if (error instanceof ZodError) {
                 return res.status(400).json({
                     status: "error",

@@ -4,12 +4,14 @@ import "dotenv/config";
 interface Config {
     port: string | number;
     dbURI: string | undefined;
+    env: string | undefined;
 }
 
 
 const _config:Config = {
     port: process.env.PORT || 3000,
-    dbURI : process.env.DATABASE_URI
+    dbURI : process.env.DATABASE_URI,
+    env : process.env.NODE_ENV
 };
 
 export const config = Object.freeze(_config);
