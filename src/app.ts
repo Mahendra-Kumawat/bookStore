@@ -1,4 +1,6 @@
 import express from "express";
+import globalErrorHandler from "./middleware/globalErrorHandler/globalErrorHandler";
+import createHttpError from "http-errors";
 
 const app = express();
 
@@ -7,7 +9,6 @@ app.get("/", (req, res, next) => {
     res.json({
         message: "Welcome to the Book Store API",
     });
-    
 });
 
 app.post("/books", (req, res, next) => {
@@ -15,5 +16,8 @@ app.post("/books", (req, res, next) => {
         message: "Book created successfully",
     });
 });
+
+// global error handler middleware
+app.use(globalErrorHandler);
 
 export default app;
