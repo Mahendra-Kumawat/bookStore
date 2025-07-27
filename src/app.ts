@@ -1,7 +1,6 @@
 import express from "express";
 import globalErrorHandler from "./middleware/globalErrorHandler/globalErrorHandler";
-import createHttpError from "http-errors";
-
+import mainRoutes from "./router/index";
 const app = express();
 
 // basic routing
@@ -16,6 +15,9 @@ app.post("/books", (req, res, next) => {
         message: "Book created successfully",
     });
 });
+
+// moduler routing
+app.use("/api/v0/", mainRoutes);
 
 // global error handler middleware
 app.use(globalErrorHandler);
