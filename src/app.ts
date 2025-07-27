@@ -1,9 +1,5 @@
-console.log("hello welcome");
+import express from "express";
 
-const greet = (msg: string): void => {
-    console.log(msg);
-};
+const app = express();
 
-greet("Hello, TypeScript!");
-
-console.log("TypeScript is awesome!");
+export default app;
