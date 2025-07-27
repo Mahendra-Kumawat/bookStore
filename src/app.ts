@@ -3,8 +3,6 @@ import mainRoutes from "./router/index";
 import globalErrorHandler from "./middleware/globalErrorHandler/globalErrorHandler";
 const app = express();
 
-
-
 // middleware
 app.use(express.json());
 
@@ -14,8 +12,6 @@ app.get("/", (req, res, next) => {
         message: "Welcome to the Book Store API",
     });
 });
-
-
 
 // moduler routing
 app.use("/api/v0/", mainRoutes);

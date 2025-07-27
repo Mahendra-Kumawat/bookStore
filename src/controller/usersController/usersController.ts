@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import UserModel from "../../models/usersModel/usersModel";
 import createHttpError from "http-errors";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import User from "../../types/userTypes";
+import { config } from "../../config/config";
+import { JwtPayload } from "../../types/jwtTypes";
 
 export const register = async (
     req: Request,
@@ -36,23 +40,48 @@ export const register = async (
     }
 
     // Step 3: Create the user in the database
+
+    let user: User;
     try {
-        const user = await UserModel.create({
+        user = await UserModel.create({
             name,
             email,
             password: hashedPassword,
         });
-
-        return res.status(201).json({
-            success: true,
-            message: "User registered successfully",
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-            },
-        });
     } catch (error) {
         return next(createHttpError(500, "Database error while creating user"));
     }
+
+    // generate the token
+    let token: string;
+    try {
+        token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+            } as JwtPayload,
+            config.JWT_SECRET_KEY as string,
+            {
+                expiresIn: "7d",
+            },
+        );
+    } catch (error) {
+        return next(createHttpError(500, "Error while generating token"));
+    }
+
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: config.env === "production",
+        sameSite: "strict",
+    });
+
+    return res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+        },
+    });
 };
