@@ -7,6 +7,7 @@ const globalErrorHandler = (
     res: Response,
     next: NextFunction,
 ) => {
+    console.log("inside global error handler");
     const statusCode = err.statusCode || 500;
     const message = err.message || "Something went wrong";
 

@@ -10,8 +10,11 @@ const startServer = async () => {
         app.listen(port, () => {
             console.log(`Server is running on port ${port}`);
         });
-    } catch (error : unknown) {
-        console.error("Failed to start the server:", error instanceof Error ? error.message : error);
+    } catch (error: unknown) {
+        console.error(
+            "Failed to start the server:",
+            error instanceof Error ? error.message : error,
+        );
         process.exit(1); // Exit the process with a failure code
     }
 };

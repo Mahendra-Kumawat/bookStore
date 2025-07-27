@@ -1,7 +1,12 @@
 import express from "express";
-import globalErrorHandler from "./middleware/globalErrorHandler/globalErrorHandler";
 import mainRoutes from "./router/index";
+import globalErrorHandler from "./middleware/globalErrorHandler/globalErrorHandler";
 const app = express();
+
+
+
+// middleware
+app.use(express.json());
 
 // basic routing
 app.get("/", (req, res, next) => {
@@ -10,11 +15,7 @@ app.get("/", (req, res, next) => {
     });
 });
 
-app.post("/books", (req, res, next) => {
-    res.status(201).json({
-        message: "Book created successfully",
-    });
-});
+
 
 // moduler routing
 app.use("/api/v0/", mainRoutes);
