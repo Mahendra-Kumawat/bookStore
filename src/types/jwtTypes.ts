@@ -1,8 +1,5 @@
-export interface JwtPayload {
+export interface JwtPayloadData {
     id: string;
     email: string;
 }
-export interface JwtToken {
-    token: string;
-    expiresIn: number;
-}
+

@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../../types/userTypes";
 import { config } from "../../config/config";
-import { JwtPayload } from "../../types/jwtTypes";
+import {  JwtPayloadData } from "../../types/jwtTypes";
 
 export const register = async (
     req: Request,
@@ -59,7 +59,7 @@ export const register = async (
             {
                 id: user._id,
                 email: user.email,
-            } as JwtPayload,
+            } as JwtPayloadData,
             config.JWT_SECRET_KEY as string,
             {
                 expiresIn: "7d",
@@ -109,7 +109,7 @@ export const login = async (
             {
                 id: user._id,
                 email: user.email,
-            } as JwtPayload,
+            } as JwtPayloadData,
             config.JWT_SECRET_KEY as string,
             {
                 expiresIn: "7d",
@@ -133,4 +133,30 @@ export const login = async (
     } catch (error) {
         return next(createHttpError(500, "Database error while logging in"));
     }
+};
+
+export const userProfile = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    console.log(req)
+
+    // if (!userId) {
+    //     return next(createHttpError(401, "Unauthorized access"));
+    // }
+
+    // try {
+    //     const user = await UserModel.findById(userId).select("-password");
+    //     if (!user) {
+    //         return next(createHttpError(404, "User not found"));
+    //     }
+
+    //     return res.status(200).json({
+    //         success: true,
+    //         user,
+    //     });
+    // } catch (error) {
+    //     return next(createHttpError(500, "Database error while fetching user"));
+    // }
 };
