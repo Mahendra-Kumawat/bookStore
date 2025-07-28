@@ -85,3 +85,52 @@ export const register = async (
         },
     });
 };
+
+export const login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return next(createHttpError(400, "Invalid email or password"));
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return next(createHttpError(400, "Invalid email or password"));
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+            } as JwtPayload,
+            config.JWT_SECRET_KEY as string,
+            {
+                expiresIn: "7d",
+            },
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: config.env === "production",
+            sameSite: config.env === "production" ? "none" : "strict",
+            maxAge: 1000 * 2, //this is just for testing, you can change it to 7 days
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "User logged in successfully",
+            user: {
+                id: user._id,
+            },
+        });
+    } catch (error) {
+        return next(createHttpError(500, "Database error while logging in"));
+    }
+};
