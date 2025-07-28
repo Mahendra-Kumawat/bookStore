@@ -8,6 +8,7 @@ export const validate =
         } catch (error) {
             console.log(error);
             if (error instanceof ZodError) {
+                console.log("this is the zod error");
                 return res.status(400).json({
                     status: "error",
                     message: "Validation failed",
@@ -16,7 +17,8 @@ export const validate =
                         message: issue.message,
                     })),
                 });
+            } else {
+                next(error);
             }
-            next(error);
         }
     };

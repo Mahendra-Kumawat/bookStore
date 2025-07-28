@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../../types/userTypes";
 import { config } from "../../config/config";
-import {  JwtPayloadData } from "../../types/jwtTypes";
+import { JwtPayloadData } from "../../types/jwtTypes";
 
 export const register = async (
     req: Request,
@@ -140,7 +140,7 @@ export const userProfile = async (
     res: Response,
     next: NextFunction,
 ) => {
-    console.log(req)
+    console.log(req);
 
     // if (!userId) {
     //     return next(createHttpError(401, "Unauthorized access"));
