@@ -1,8 +1,11 @@
+import User from "./userTypes";
+
 export interface Book {
     _id: string;
     name: string;
-    author: string;
+    author: User;
     description: string;
     price: number;
-    image: string;
+    coverImage: string;
+    file: string;
 }
