@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "node:path";
 
-const uploader = multer({
+const multerUploader = multer({
     // in the line __dirname represent the current folder
     dest: path.resolve(__dirname, "../../../public/uploads"),
     limits: {
@@ -9,4 +9,4 @@ const uploader = multer({
     },
 });
 
-export { uploader };
+export { multerUploader };

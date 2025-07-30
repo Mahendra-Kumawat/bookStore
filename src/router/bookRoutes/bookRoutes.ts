@@ -1,4 +1,4 @@
-import { uploader } from "../../middleware/fileUploader/uploader";
+import { multerUploader } from "../../middleware/fileUploader/multerUploader";
 import { createBook } from "../../controller/bookController/bookController";
 import { Router } from "express";
 
@@ -7,7 +7,7 @@ const bookRoutes = Router();
 bookRoutes.post(
     "/create",
     [
-        uploader.fields([
+        multerUploader.fields([
             // this is the multer configration to upload the files
             {
                 name: "coverImage",
