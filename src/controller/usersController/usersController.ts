@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import User from "../../types/userTypes";
 import { config } from "../../config/config";
 import { JwtPayloadData } from "../../types/jwtTypes";
+import { AuthRequest } from "../../types/authRequest";
 
 export const register = async (
     req: Request,
@@ -57,7 +58,7 @@ export const register = async (
     try {
         token = jwt.sign(
             {
-                id: user._id,
+                userId: user._id,
                 email: user.email,
             } as JwtPayloadData,
             config.JWT_SECRET_KEY as string,
@@ -73,7 +74,7 @@ export const register = async (
         httpOnly: true,
         secure: config.env === "production",
         sameSite: "strict",
-        maxAge: 1000 * 60 * 2, //this is just for testing, you can change it to 7 days
+        maxAge: 1000 * 60 * 60 * 24, //this is just for testing, you can change it to 7 days
     });
 
     return res.status(201).json({
@@ -108,7 +109,7 @@ export const login = async (
 
         const token = jwt.sign(
             {
-                id: user._id,
+                userId: user._id,
                 email: user.email,
             } as JwtPayloadData,
             config.JWT_SECRET_KEY as string,
@@ -121,7 +122,7 @@ export const login = async (
             httpOnly: true,
             secure: config.env === "production",
             sameSite: config.env === "production" ? "none" : "strict",
-            maxAge: 1000 * 60 * 2, //this is just for testing, you can change it to 7 days
+            maxAge: 1000 * 60 * 60 * 24, //this is just for testing, you can change it to 7 days
         });
 
         return res.status(200).json({
@@ -137,32 +138,33 @@ export const login = async (
 };
 
 export const userProfile = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
 ) => {
-    console.log(req);
+    const { userId } = req.user as JwtPayloadData;
 
-    return res.status(200).json({
-        success: true,
-        message: "User profile fetched successfully",
-    });
+    if (!userId) {
+        return next(createHttpError(401, "Unauthorized access"));
+    }
 
-    // if (!userId) {
-    //     return next(createHttpError(401, "Unauthorized access"));
-    // }
+    try {
+        const user = await UserModel.findById(userId, {
+            name: 1,
+            email: 1,
+        }).select("-password");
+        if (!user) {
+            return next(createHttpError(404, "User not found"));
+        }
 
-    // try {
-    //     const user = await UserModel.findById(userId).select("-password");
-    //     if (!user) {
-    //         return next(createHttpError(404, "User not found"));
-    //     }
-
-    //     return res.status(200).json({
-    //         success: true,
-    //         user,
-    //     });
-    // } catch (error) {
-    //     return next(createHttpError(500, "Database error while fetching user"));
-    // }
+        return res.status(200).json({
+            success: true,
+            message: "User profile fetched successfully",
+            data: {
+                user,
+            },
+        });
+    } catch (error) {
+        return next(createHttpError(500, "Database error while fetching user"));
+    }
 };

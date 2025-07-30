@@ -8,9 +8,7 @@ import { AuthRequest } from "../../types/authRequest";
 const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
     const token = req.cookies?.token;
 
-    console.log(req.cookies);
-
-    console.log("token", token as string);
+   
 
     if (!token) {
         next(createHttpError(401, "unauthorized access, no token provided"));
@@ -24,9 +22,9 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
         ) as JwtPayloadData;
         req.user = decoded;
 
-        req.userId = decoded.id;
+       
 
-        console.log(req);
+        console.log("the request is here ====> ", req.user);
         next();
     } catch (error) {
         // Here you would typically verify the token using a library like jsonwebtoken
