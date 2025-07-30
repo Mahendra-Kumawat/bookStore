@@ -4,13 +4,14 @@ import bookModel from "../../models/booksModel/booksModel";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 import { AuthRequest } from "../../types/authRequest";
 import { JwtPayloadData } from "../../types/jwtTypes";
+import createHttpError from "http-errors";
 
 export const createBook = async (
     req: AuthRequest,
     res: Response,
     next: NextFunction,
 ) => {
-    const { name, description, price, author } = req.body;
+    const { name, description, price } = req.body;
 
     const { userId } = req.user as JwtPayloadData;
     const { coverImage, file } = req.files as {
@@ -46,4 +47,73 @@ export const createBook = async (
     } catch (error) {
         return next(error);
     }
+};
+
+export const updateBook = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+) => {
+    const { name, description, price } = req.body;
+
+    console.log("name is here ====> ", name);
+    console.log("description is here ====> ", description);
+    console.log("price is here ====> ", price);
+
+    const { coverImage, file } = req.files as {
+        coverImage: Express.Multer.File[];
+        file: Express.Multer.File[];
+    };
+
+    if (!coverImage || !file) {
+        return next(createHttpError(400, "Please provide coverImage and file"));
+    }
+
+    console.log("coverImage is here ====> ", coverImage);
+
+    const { bookId } = req.params;
+
+    try {
+        const book = await bookModel.findOne({ _id: bookId });
+
+        if (!book) {
+            return next(createHttpError(404, "Book not found"));
+        }
+
+        if (book.author.toString() !== req.user?.userId) {
+            return next(createHttpError(403, "Unauthorized access"));
+        }
+
+        const coverImageUrl = await uploadToCloudinary(
+            coverImage[0],
+            "books_cover_images",
+        );
+        const bookUrl = await uploadToCloudinary(file[0], "books");
+
+        const newBook = await bookModel.findOneAndUpdate(
+            {
+                _id: bookId,
+            },
+            {
+                name,
+                description,
+                price,
+                coverImage: coverImageUrl,
+                file: bookUrl,
+            },
+            {
+                new: true,
+            },
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "book update Successfully",
+            data: newBook,
+        });
+    } catch (error) {
+        next(error);
+    }
+
+    return res.status(200).json({});
 };

@@ -1,5 +1,8 @@
 import { multerUploader } from "../../middleware/fileUploader/multerUploader";
-import { createBook } from "../../controller/bookController/bookController";
+import {
+    createBook,
+    updateBook,
+} from "../../controller/bookController/bookController";
 import { Router } from "express";
 import verifyToken from "../../middleware/verifyToken/verifyToken";
 
@@ -23,5 +26,20 @@ bookRoutes.post(
     ],
     createBook,
 );
+
+bookRoutes.put("/update/:bookId", [
+    verifyToken,
+    multerUploader.fields([
+        {
+            name: "coverImage",
+            maxCount: 1,
+        },
+        {
+            name: "file",
+            maxCount: 1,
+        },
+    ]),
+    updateBook,
+]);
 
 export default bookRoutes;
