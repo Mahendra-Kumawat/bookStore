@@ -156,13 +156,16 @@ export const deleteBook = async (
     }
 };
 
-export const listAllBooks = (
+export const listAllBooks = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
     try {
-        const allBooks = bookModel.find();
+        const allBooks = await bookModel
+            .find()
+            .select("-__v")
+            .populate("author", "name email");
 
         return res.status(200).json({
             success: true,
