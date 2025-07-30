@@ -1,6 +1,8 @@
 import { multerUploader } from "../../middleware/fileUploader/multerUploader";
 import {
     createBook,
+    deleteBook,
+    listAllBooks,
     updateBook,
 } from "../../controller/bookController/bookController";
 import { Router } from "express";
@@ -41,5 +43,9 @@ bookRoutes.put("/update/:bookId", [
     ]),
     updateBook,
 ]);
+
+bookRoutes.get("/", [verifyToken], listAllBooks);
+
+bookRoutes.delete("/:bookId", [verifyToken], deleteBook);
 
 export default bookRoutes;

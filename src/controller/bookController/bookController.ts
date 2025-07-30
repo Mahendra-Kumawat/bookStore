@@ -22,11 +22,16 @@ export const createBook = async (
     console.log("the files are here ====> ", coverImage, file);
 
     try {
-        const coverImageUrl = await uploadToCloudinary(
-            coverImage[0],
-            "books_cover_images",
-        );
-        const bookUrl = await uploadToCloudinary(file[0], "books");
+        // const coverImageUrl = await uploadToCloudinary(
+        //     coverImage[0],
+        //     "books_cover_images",
+        // );
+        // const bookUrl = await uploadToCloudinary(file[0], "books");
+
+        const [coverImageUrl, bookUrl] = await Promise.all([
+            uploadToCloudinary(coverImage[0], "books_cover_images"),
+            uploadToCloudinary(file[0], "books"),
+        ]);
 
         const book = await bookModel.create({
             name,
@@ -84,11 +89,10 @@ export const updateBook = async (
             return next(createHttpError(403, "Unauthorized access"));
         }
 
-        const coverImageUrl = await uploadToCloudinary(
-            coverImage[0],
-            "books_cover_images",
-        );
-        const bookUrl = await uploadToCloudinary(file[0], "books");
+        const [coverImageUrl, bookUrl] = await Promise.all([
+            uploadToCloudinary(coverImage[0], "books_cover_images"),
+            uploadToCloudinary(file[0], "books"),
+        ]);
 
         const newBook = await bookModel.findOneAndUpdate(
             {
@@ -116,4 +120,56 @@ export const updateBook = async (
     }
 
     return res.status(200).json({});
+};
+
+export const deleteBook = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+) => {
+    const bookId = req.params.bookId;
+
+    console.log(bookId);
+
+    try {
+        const book = await bookModel.findOne({ _id: bookId });
+
+        if (!book) {
+            return next(createHttpError(404, "Book not found"));
+        }
+
+        if (book.author.toString() !== req.user?.userId) {
+            return next(createHttpError(403, "Unauthorized access"));
+        }
+
+        const result = await bookModel.deleteOne({ _id: bookId });
+
+        if (result.deletedCount === 1) {
+            return res.status(200).json({
+                success: true,
+                message: "Book deleted successfully",
+                data: null,
+            });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const listAllBooks = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const allBooks = bookModel.find();
+
+        return res.status(200).json({
+            success: true,
+            message: "All books fetched successfully",
+            data: allBooks,
+        });
+    } catch (error) {
+        next(error);
+    }
 };
