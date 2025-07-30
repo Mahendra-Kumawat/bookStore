@@ -1,34 +1,41 @@
-// import { NextFunction, Request, Response } from "express";
-// import createHttpError from "http-errors";
-// import jwt from "jsonwebtoken";
-// import { config } from "../../config/config";
-// import { JwtPayloadData } from "../../types/jwtTypes";
+import { NextFunction, Request, Response } from "express";
+import createHttpError from "http-errors";
+import jwt from "jsonwebtoken";
+import { config } from "../../config/config";
+import { JwtPayloadData } from "../../types/jwtTypes";
+import { AuthRequest } from "../../types/authRequest";
 
-// const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-//     const token = req.cookies?.token;
+const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+    const token = req.cookies?.token;
 
-//     if (!token) {
-//         next(createHttpError(401, "unauthorized access, no token provided"));
-//         return;
-//     }
+    console.log(req.cookies);
 
-//     try {
-//         const decoded = jwt.verify(
-//             token,
-//             config.JWT_SECRET_KEY as string,
-//         ) as JwtPayloadData;
-//         req.user = decoded;
+    console.log("token", token as string);
 
-//         console.log(req);
-//         next();
-//     } catch (error) {
-//         // Here you would typically verify the token using a library like jsonwebtoken
-//         // For example:
+    if (!token) {
+        next(createHttpError(401, "unauthorized access, no token provided"));
+        return;
+    }
 
-//         next(createHttpError(401, "Invalid token"));
-//         return;
-//     }
-// };
+    try {
+        const decoded = jwt.verify(
+            token,
+            config.JWT_SECRET_KEY as string,
+        ) as JwtPayloadData;
+        req.user = decoded;
 
-// export default verifyToken;
-// //
+        req.userId = decoded.id;
+
+        console.log(req);
+        next();
+    } catch (error) {
+        // Here you would typically verify the token using a library like jsonwebtoken
+        // For example:
+
+        next(createHttpError(401, "token Expired or invalid"));
+        return;
+    }
+};
+
+export default verifyToken;
+//
