@@ -73,6 +73,7 @@ export const register = async (
         httpOnly: true,
         secure: config.env === "production",
         sameSite: "strict",
+        maxAge: 1000 * 60 * 2, //this is just for testing, you can change it to 7 days
     });
 
     return res.status(201).json({
@@ -120,7 +121,7 @@ export const login = async (
             httpOnly: true,
             secure: config.env === "production",
             sameSite: config.env === "production" ? "none" : "strict",
-            maxAge: 1000 * 2, //this is just for testing, you can change it to 7 days
+            maxAge: 1000 * 60 * 2, //this is just for testing, you can change it to 7 days
         });
 
         return res.status(200).json({
@@ -141,6 +142,11 @@ export const userProfile = async (
     next: NextFunction,
 ) => {
     console.log(req);
+
+    return res.status(200).json({
+        success: true,
+        message: "User profile fetched successfully",
+    });
 
     // if (!userId) {
     //     return next(createHttpError(401, "Unauthorized access"));
