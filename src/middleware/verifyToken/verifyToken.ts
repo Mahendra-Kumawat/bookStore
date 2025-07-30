@@ -10,6 +10,7 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
 
    
 
+    
     if (!token) {
         next(createHttpError(401, "unauthorized access, no token provided"));
         return;
