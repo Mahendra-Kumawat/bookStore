@@ -1,12 +1,46 @@
 import { NextFunction, Request, Response } from "express";
 
+import bookModel from "../../models/booksModel/booksModel";
+import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
+
 export const createBook = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
-    return res.status(200).json({
-        success: true,
-        message: "Book created successfully",
-    })
+    const { name, description, price, author } = req.body;
+    const { coverImage, file } = req.files as {
+        coverImage: Express.Multer.File[];
+        file: Express.Multer.File[];
+    };
+
+
+    console.log("the files are here ====> ", coverImage, file);
+
+    try {
+        const coverImageUrl = await uploadToCloudinary(
+            coverImage[0],
+            "books_cover_images",
+        );
+        const bookUrl = await uploadToCloudinary(file[0], "books");
+
+        const book = await bookModel.create({
+            name,
+            author,
+            description,
+            price,
+            coverImage: coverImageUrl,
+            file: bookUrl,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Book created successfully",
+            data: {
+                id: book._id,
+            },
+        });
+    } catch (error) {
+        return next(error);
+    }
 };
